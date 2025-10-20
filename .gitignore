@@ -249,3 +249,6 @@ pip-selfcheck.json
 /debug
 /test*.py
 .conda
+analysis_results/
+analysis_results_swanlab/
+evorl-ubuntu-v1.tar
