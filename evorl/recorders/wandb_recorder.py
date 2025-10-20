@@ -21,8 +21,6 @@ class WandbRecorder(Recorder):
             "dir": path,
             **wandb_kwargs,
         }
-        # Ensure a fresh run per Hydra child process to avoid reusing active runs
-        self.wandb_kwargs.setdefault("reinit", True)
 
     def init(self) -> None:
         # Be tolerant to already-active runs in multirun scenarios
