@@ -21,19 +21,46 @@ class WandbRecorder(Recorder):
             "dir": path,
             **wandb_kwargs,
         }
+        # Ensure a fresh run per Hydra child process to avoid reusing active runs
+        self.wandb_kwargs.setdefault("reinit", True)
 
     def init(self) -> None:
-        wandb.init(**self.wandb_kwargs)
-        swanlab.init(**self.wandb_kwargs)
-        swanlab.sync_wandb()
+        # Be tolerant to already-active runs in multirun scenarios
+        try:
+            wandb.init(**self.wandb_kwargs)
+        except Exception:
+            pass
+        try:
+            swanlab.init(**self.wandb_kwargs)
+        except Exception:
+            pass
+        try:
+            swanlab.sync_wandb()
+        except Exception:
+            pass
 
     def write(self, data: Mapping[str, Any], step: int | None = None) -> None:
         data = jtu.tree_map(lambda x: _convert_data(x), data)
-        wandb.log(data, step=step)
-        swanlab.log(data, step=step)
+        try:
+            wandb.log(data, step=step)
+        except Exception:
+            pass
+        try:
+            swanlab.log(data, step=step)
+        except Exception:
+            pass
 
     def close(self):
-        wandb.finish()
+        # Explicitly finish swanlab first, then wandb; both guarded to avoid
+        # errors when a run wasn't successfully initialized in this process
+        try:
+            swanlab.finish()
+        except Exception:
+            pass
+        try:
+            wandb.finish()
+        except Exception:
+            pass
 
 
 def _convert_data(val: Any):
