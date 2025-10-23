@@ -6,7 +6,7 @@ hydra:
   sweep:
     dir: multirun/${hydra.job.name}/${now:%Y-%m-%d_%H-%M-%S}
     subdir: ${sanitize_dirname:${hydra.job.override_dirname}}
-  verbose: false
+  verbose: false  # 关闭 Hydra 的详细日志输出
 
 project: "EvoRL"
 tags: []

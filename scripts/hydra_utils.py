@@ -6,10 +6,30 @@ from absl import logging
 
 
 def set_omegaconf_resolvers():
-    """Senitize the dirname."""
-    OmegaConf.register_new_resolver(
-        "sanitize_dirname", lambda path: re.sub(r"/", "_", path)
-    )
+    """Register custom OmegaConf resolvers."""
+    # 注册路径名清理 resolver
+    if not OmegaConf.has_resolver("sanitize_dirname"):
+        OmegaConf.register_new_resolver(
+            "sanitize_dirname", lambda path: re.sub(r"/", "_", path)
+        )
+    
+    # 专门用于计算 checkpoint save_interval_steps
+    # 每 10% 的 total_timesteps 保存一次
+    if not OmegaConf.has_resolver("ckpt_interval_10pct"):
+        OmegaConf.register_new_resolver(
+            "ckpt_interval_10pct",
+            lambda total_timesteps, num_envs, rollout_length: 
+                int(total_timesteps * 0.1 / (num_envs * rollout_length))
+        )
+    
+    # 专门用于计算 eval_interval
+    # 每 10% 的总迭代次数评估一次
+    if not OmegaConf.has_resolver("eval_interval_10pct"):
+        OmegaConf.register_new_resolver(
+            "eval_interval_10pct",
+            lambda total_timesteps, num_envs, rollout_length: 
+                max(1, int(total_timesteps / (num_envs * rollout_length) / 10))
+        )
 
 
 def get_output_dir(default_path: str = "./debug"):

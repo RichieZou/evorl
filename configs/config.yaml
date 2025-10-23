@@ -7,8 +7,12 @@ defaults:
 
 seed: 42
 enable_jit: true
+# Checkpoint 配置（关键！）
+# 每消耗 10% 交互次数保存一次，总共保存 10 次
 checkpoint:
-  enable: false
-  save_interval_steps: 100
-  max_to_keep: null
+  enable: true
+  # 动态计算：每 10% 的 total_timesteps 保存一次
+  save_interval_steps: ${ckpt_interval_10pct:${total_timesteps},${num_envs},${rollout_length}}
+  max_to_keep: 10  # 保留所有 checkpoint (10%, 20%, ..., 100%)
 output_dir: './output-dev' # would be overridden by training scripts
+

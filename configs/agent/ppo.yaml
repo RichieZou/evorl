@@ -20,21 +20,21 @@ total_timesteps: 1000000
 # total_timesteps: ${eval:'int( ${num_envs} * ${rollout_length})'}
 
 
-num_eval_envs: 16
-eval_episodes: 16 # should be divided by num_eval_envs
+num_eval_envs: 10
+eval_episodes: 10 # should be divided by num_eval_envs
 eval_interval: 2
 
 loss_weights:
   actor_loss: 1.0
   critic_loss: 0.5
-  actor_entropy: -0.01
+  actor_entropy: -0.01 # 已定
 
 optimizer:
-  lr: 0.0003
-  grad_clip_norm: 10.0 # set 0 or null to turn-off
+  lr: 0.0003 # 已定
+  grad_clip_norm: 5.0 # set 0 or null to turn-off 已定
 
 agent_network:
-  actor_hidden_layer_sizes: [256, 256]
-  critic_hidden_layer_sizes: [256, 256]
+  actor_hidden_layer_sizes: [256, 256] # 已定
+  critic_hidden_layer_sizes: [256, 256] # 已定
   policy_obs_key: null
   value_obs_key: null
